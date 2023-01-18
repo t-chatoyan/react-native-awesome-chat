@@ -1,9 +1,15 @@
 import React, {Component} from 'react';
 import { Text, View, Image, StyleSheet, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import Swipeable from 'react-native-swipeable';
+import moment from 'moment';
 
 const {width, height} = Dimensions.get("window")
-const dateToCondensedLocaleDateString = (date) => (date.toLocaleString().split(",")[1].split(" ")[1].substr(0, date.toLocaleString().split(",")[1].split(" ")[1].length - 3) + " " + date.toLocaleString().split(",")[1].split(" ")[2] + ", " + date.toLocaleString().split(",")[0].substr(0, date.toLocaleString().split(",")[0].length - 2))
+const dateToCondensedLocaleDateString = (date) => {
+  if (date) {
+    return moment(date).format('MM/D/YYYY, h:mm:ss');
+  }
+  return "";
+}
 
 export default class MessageComponent extends Component {
     constructor(props) {
@@ -31,7 +37,7 @@ export default class MessageComponent extends Component {
     render() {
         let message = { ... this.props }
         let timestampStyle =  message.type == "sent" ?
-                              {color : this.props.timestampColor || "grey", position : 'absolute', bottom : message.image_uri ? '15%' : '3%'} 
+                              {color : this.props.timestampColor || "grey", position : 'absolute', bottom : message.image_uri ? '15%' : '3%'}
                             : {color : this.props.timestampColor || "grey", position : 'absolute', bottom : message.image_uri ? '15%' : '3%', right : '0%'}
         let Timestamp = <View style={{height : this.state.messageHeight, position : 'relative'}}>
                             <Text style={timestampStyle}>
@@ -50,32 +56,32 @@ export default class MessageComponent extends Component {
         var defaultMessageStyle = { backgroundColor: message.type == "sent" && !this.state.sent ? "lightblue" : messageColor }
         var defaultTextStyle = {color: textColor, padding: "3%"}
 
-        var finalTextStyle = message.type == "sent" 
-        ? !this.state.sent && this.props.unsentTextStyle != null 
-          ? this.props.unsentTextStyle 
-          : this.props.sentTextStyle != null 
-            ? this.props.sentTextStyle 
+        var finalTextStyle = message.type == "sent"
+        ? !this.state.sent && this.props.unsentTextStyle != null
+          ? this.props.unsentTextStyle
+          : this.props.sentTextStyle != null
+            ? this.props.sentTextStyle
             : defaultTextStyle
         : this.props.receivedTextStyle != null
-          ? this.props.receivedTextStyle 
+          ? this.props.receivedTextStyle
           : defaultTextStyle
-        
-        var finalMessageStyle = message.type == "sent" 
+
+        var finalMessageStyle = message.type == "sent"
         ? !this.state.sent && this.props.unsentMessageStyle != null
-           ? this.props.unsentMessageStyle 
-           : this.props.sentMessageStyle != null 
-             ? this.props.sentMessageStyle 
+           ? this.props.unsentMessageStyle
+           : this.props.sentMessageStyle != null
+             ? this.props.sentMessageStyle
              : defaultMessageStyle
         : this.props.receivedMessageStyle != null
-          ? this.props.receivedMessageStyle 
+          ? this.props.receivedMessageStyle
           : defaultMessageStyle
 
         return (
-            <Swipeable 
-                rightContent={message.type == "sent" ? Timestamp : null} 
+            <Swipeable
+                rightContent={message.type == "sent" ? Timestamp : null}
                 leftContent={message.type == "received" ? Timestamp : null}>
             {
-               ! message.image_uri ? 
+               ! message.image_uri ?
                <TouchableWithoutFeedback onPress={this.tryAgain}>
                     <View style={{ width: width, alignItems: align }}>
                         <View
@@ -91,8 +97,8 @@ export default class MessageComponent extends Component {
                 </TouchableWithoutFeedback>
                  :
                 <TouchableWithoutFeedback onPress={this.tryAgain}>
-                    <View 
-                    style={{alignItems : align, width : width}} 
+                    <View
+                    style={{alignItems : align, width : width}}
                     onLayout={event => this.setState({messageHeight: event.nativeEvent.layout.height})}>
                         <Image source={{uri : message.image_uri}} style={styles.imageStyle} />
                     </View>
@@ -103,7 +109,7 @@ export default class MessageComponent extends Component {
                 (
                 <Text style={{...styles.sendAgainTextStyle, color : this.props.errorColor || "red"}}>
                     Failed to send. Tap to try again.
-                </Text> 
+                </Text>
                 ) : null
             }
             </Swipeable>
@@ -114,23 +120,23 @@ export default class MessageComponent extends Component {
 const styles = StyleSheet.create({
     imageStyle : {
         height : 100,
-        width : 100, 
+        width : 100,
         marginBottom : '5%',
         marginLeft : '5%',
-        marginRight : '5%', 
+        marginRight : '5%',
         borderRadius : 10
     },
     messageStyle : {
         marginLeft: "5%",
         marginRight: "5%",
         borderRadius: 20,
-        marginBottom: "5%"      
+        marginBottom: "5%"
     },
     sendAgainTextStyle : {
-        fontSize : 12, 
-        textAlign : 'right', 
-        paddingRight : '5%', 
-        paddingBottom : '5%', 
+        fontSize : 12,
+        textAlign : 'right',
+        paddingRight : '5%',
+        paddingBottom : '5%',
         marginTop : '-3%'
     }
 })

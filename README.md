@@ -21,10 +21,10 @@
 
 # Installation
 
-`npm install --save react-native-awesome-chat`
+`npm install --save git+https://github.com/t-chatoyan/react-native-awesome-chat.git`
 OR
 
-`yarn add react-native-awesome-chat`
+`yarn add git+https://github.com/t-chatoyan/react-native-awesome-chat.git`
 
 ## Dependencies
 
