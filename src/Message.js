@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Text, View, Image, StyleSheet, Dimensions, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, Image, StyleSheet, Dimensions, TouchableWithoutFeedback, ImageBackground } from 'react-native';
 import Swipeable from 'react-native-swipeable';
 import moment from 'moment';
 
@@ -79,6 +79,7 @@ export default class MessageComponent extends Component {
 
     return (
       <Swipeable
+        key={message.id}
         rightContent={message.type == "sent" ? Timestamp : null}
         leftContent={message.type == "received" ? Timestamp : null}>
         {
@@ -86,7 +87,6 @@ export default class MessageComponent extends Component {
             <TouchableWithoutFeedback onPress={this.tryAgain}>
               <View style={{ width: width, alignItems: align }}>
                 <View
-                  key={message.id}
                   onLayout={event => this.setState({messageHeight: event.nativeEvent.layout.height})}
                   style={{...styles.messageStyle, ...finalMessageStyle}}
                 >
@@ -99,18 +99,14 @@ export default class MessageComponent extends Component {
             :
             <TouchableWithoutFeedback onPress={this.tryAgain}>
               <View
-                key={message.id}
-                style={{alignItems: align, flex: 1, resizeMode: 'contain'}}
+                style={{alignItems: align, flex: 1}}
                 onLayout={event => this.setState({messageHeight: event.nativeEvent.layout.height})}
               >
                 <Image
-                  key={message.id}
-                  source={{uri : message.image_uri, scale: 1}}
+                  source={{uri: 'https://my.support.ua/public/uploads/jivochat/899b3a2255171f36648cba357d0b98fc.jpg'}}
                   style={styles.imageStyle}
-                  onLoadStart={() => this.setState({loadImage: true})}
-                  onLoadEnd={() =>  this.setState({loadImage: false})}
+                  resizeMode="cover"
                 />
-                {this.state.loadImage && <View style={styles.imageLoader} />}
               </View>
             </TouchableWithoutFeedback>
         }
@@ -128,6 +124,15 @@ export default class MessageComponent extends Component {
 }
 
 const styles = StyleSheet.create({
+  imageStyle : {
+    flex: 1,
+    height : 100,
+    width : 100,
+    marginBottom : '5%',
+    marginLeft : '5%',
+    marginRight : '5%',
+    borderRadius : 10
+  },
   imageLoader : {
     height : 100,
     width : 100,
@@ -138,15 +143,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3f3f3',
     borderColor: '#dcdcdc',
     borderWidth: 1
-  },
-  imageStyle : {
-    height : 100,
-    width : 100,
-    marginBottom : '5%',
-    marginLeft : '5%',
-    marginRight : '5%',
-    borderRadius : 10,
-    resizeMode: 'cover',
   },
   messageStyle : {
     marginLeft: "5%",

@@ -1,12 +1,16 @@
 import React, { Component } from "react";
 import {
   View,
+  Text,
   StyleSheet,
   Dimensions,
   KeyboardAvoidingView,
+  Image,
   ScrollView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   SafeAreaView,
+  Keyboard,
   ImageBackground,
   Platform
 } from "react-native";
@@ -36,30 +40,14 @@ class AwesomeChat extends Component {
     super(props);
     this.state = {
       input: "",
-      messages: [ ... this.props.messages ]
     };
     this.messageRefs = {};
   }
 
-  shouldComponentUpdate(nextProps, nextState){
-    if(nextProps.messages.length > this.props.messages.length){
-      return true;
-    }
-    return true;
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.messages.length > prevProps.messages.length) {
-      this.setState({
-        messages: [ ...this.props.messages]
-      })
-    }
-  }
-
   getMessageById = (id) => {
-    for(var i = 0; i < this.state.messages.length; i++){
-      if(this.state.messages[i].id == id){
-        return this.state.messages[i];
+    for(var i = 0; i < this.props.messages.length; i++){
+      if(this.props.messages[i].id == id){
+        return this.props.messages[i];
       }
     }
     return null;
@@ -77,11 +65,11 @@ class AwesomeChat extends Component {
     ImagePicker.showImagePicker(options, async (response) => {
       if (!(response.didCancel || response.error || response.customButton)) {
         let message = {
-          body: "",
-          id:  sha1(response.uri + new Date().toString()),
-          timestamp: "",
-          type: "sent",
-          image_uri: response.uri
+          body : "",
+          id :  sha1(response.uri + new Date().toString()),
+          timestamp : "",
+          type : "sent",
+          image_uri : response.uri
         }
         this.sendMessage(message)
       }
@@ -112,9 +100,7 @@ class AwesomeChat extends Component {
   };
 
   sendMessage = async (message) => {
-    var messages = [...this.state.messages, message];
     this.setState({
-      messages: messages,
       input: "",
     }, async () => {
       let success = await this.props.onSendMessage(message);
@@ -142,16 +128,15 @@ class AwesomeChat extends Component {
             keyboardDismissMode="on-drag"
           >
             <View style={styles.messagesContainerStyle}>
-              {this.state.messages.map((message)=> (
+              {this.props.messages.map((message, index)=> (
                 <MessageComponent
                   ref={(ref) => this.messageRefs[message.id] = ref}
                   body={message.body}
-                  key={message.timestamp}
                   id={message.id}
+                  key={index}
                   image_uri={message.image_uri}
                   timestamp={message.timestamp}
                   type={message.type}
-                  key={message.id}
                   tryAgain={this.sendMessageAgain}
                   sentMessageStyle={this.props.sentMessageStyle || null}
                   unsentMessageStyle={this.props.unsentMessageStyle || null}
