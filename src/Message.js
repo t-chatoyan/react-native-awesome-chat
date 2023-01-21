@@ -103,7 +103,7 @@ export default class MessageComponent extends Component {
                 onLayout={event => this.setState({messageHeight: event.nativeEvent.layout.height})}
               >
                 <Image
-                  source={{uri: 'https://my.support.ua/public/uploads/jivochat/899b3a2255171f36648cba357d0b98fc.jpg'}}
+                  source={{uri : message.image_uri, scale: 1}}
                   style={styles.imageStyle}
                   resizeMode="cover"
                 />
