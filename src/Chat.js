@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { Button, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
-import ImagePicker from "react-native-image-picker";
+import { launchImageLibrary } from "react-native-image-picker";
 import MessageComponent from './Message';
 import sha1 from 'js-sha1';
 
@@ -62,16 +62,18 @@ class AwesomeChat extends Component {
         skipBackup: true
       }
     };
-    ImagePicker.showImagePicker(options, async (response) => {
+    await launchImageLibrary(options, (response) => {
       if (!(response.didCancel || response.error || response.customButton)) {
-        let message = {
-          body : "",
-          id :  sha1(response.uri + new Date().toString()),
-          timestamp : "",
-          type : "sent",
-          image_uri : response.uri
+        if (response.assets.length && response.assets[0].uri) {
+          let message = {
+            body: "",
+            id: sha1(response.assets[0].uri + new Date().toString()),
+            timestamp: "",
+            type: "sent",
+            image_uri: response.assets[0].uri
+          }
+          this.sendMessage(message)
         }
-        this.sendMessage(message)
       }
     });
   }
