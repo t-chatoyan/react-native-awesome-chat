@@ -34,6 +34,15 @@ const keyboardVerticalOffsetsANDROID = {
   "816" : -260
 }
 
+const imagePickerOptions = {
+  quality: 1.0,
+  maxWidth: 500,
+  maxHeight: 500,
+  storageOptions: {
+    skipBackup: true,
+  }
+};
+
 const { width, height } = Dimensions.get("window");
 
 class AwesomeChat extends Component {
