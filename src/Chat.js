@@ -16,10 +16,11 @@ import {
 } from "react-native";
 import { Button, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { launchImageLibrary } from "react-native-image-picker";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import ImageResizer from "react-native-image-resizer";
 import MessageComponent from './Message';
 import sha1 from 'js-sha1';
-
+import { PermissionsAndroid } from "react-native";
 const keyboardVerticalOffsetsIOS = {
   "812" : 44,
   "667" : 20,
@@ -43,6 +44,63 @@ class AwesomeChat extends Component {
     };
     this.messageRefs = {};
   }
+
+  async requestCameraPermission() {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: "Camera Permission",
+          message: "App needs access to your camera.",
+          buttonPositive: "OK",
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("Camera permission granted");
+      } else {
+        console.log("Camera permission denied");
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  sendImage = (image) => {
+    if (!(image.didCancel || image.error || image.errorCode)) {
+      if (image.assets.length && image.assets[0].uri) {
+        ImageResizer.createResizedImage(
+          image.assets[0].uri,
+          1820,
+          2546,
+          'JPEG',
+          100,
+          0,
+        )
+          .then((data) => {
+            let message = {
+              body: '',
+              id: (data.uri + new Date().toString()),
+              timestamp: '',
+              type: 'sent',
+              image_uri: data.uri,
+            };
+            this.sendMessage(message);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    }
+  };
+
+  sendPicture = async () => {
+    await launchImageLibrary(imagePickerOptions, this.sendImage);
+  };
+
+  takePicture = async () => {
+    await this.requestCameraPermission();
+    await launchCamera(imagePickerOptions, this.sendImage);
+  };
 
   getMessageById = (id) => {
     for(var i = 0; i < this.props.messages.length; i++){
@@ -83,43 +141,72 @@ class AwesomeChat extends Component {
     this.messageRefs[id].markSent();
     let message = this.getMessageById(id);
     let success = await this.props.onSendMessage(message);
-    if(!success){
+    if (!success) {
       this.messageRefs[id].markUnsent();
     }
-  }
+  };
 
   craftMessage = async () => {
-    if(this.state.input == "")
+    if (this.state.input == '') {
       return;
-    let message = {
-      body : this.state.input,
-      id : sha1(this.state.input + new Date().toString()),
-      timestamp : "",
-      type : "sent",
-      image_uri : ""
     }
-    this.sendMessage(message)
+    let message = {
+      body: this.state.input,
+      id: sha1(this.state.input + new Date().toString()),
+      timestamp: '',
+      type: 'sent',
+      image_uri: '',
+    };
+    this.sendMessage(message);
   };
 
   sendMessage = async (message) => {
-    this.setState({
-      input: "",
-    }, async () => {
-      let success = await this.props.onSendMessage(message);
-      if(!success){
-        this.messageRefs[message.id].markUnsent();
-      }
-    });
+    this.setState(
+      {
+        input: '',
+      },
+      async () => {
+        let success = await this.props.onSendMessage(message);
+        if (!success) {
+          this.messageRefs[message.id].markUnsent();
+        }
+      },
+    );
   };
 
+  leftIcon = () => (
+    <View
+      style={{
+        flexDirection: 'row',
+      }}
+    >
+      <TouchableOpacity onPress={this.takePicture} style={{marginRight: 12}}>
+        {this.props.leftIcon || (
+          <Icon name="camera" size={24} color={'#bcbcbc'} />
+        )}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={this.sendPicture}>
+        {this.props.leftIcon || (
+          <Icon name="paperclip" size={24} color={'#bcbcbc'} />
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+
   renderChatView = () => {
-    const leftIcon =  <TouchableOpacity onPress={this.sendPicture}>
-      {this.props.leftIcon || <Icon name="camera" size={24} color={"#bcbcbc"} />}
-    </TouchableOpacity>
-    const rightIcon = <TouchableOpacity onPress={this.craftMessage}>
-      {this.props.rightIcon || <Icon name="arrow-circle-up" size={30} color={this.props.rightIconColor || "#b8ccff"} />}
-    </TouchableOpacity>
-    return(
+    const rightIcon = (
+      <TouchableOpacity onPress={this.craftMessage}>
+        {this.props.rightIcon || (
+          <Icon
+            name="arrow-circle-up"
+            size={30}
+            color={this.props.rightIconColor || '#b8ccff'}
+          />
+        )}
+      </TouchableOpacity>
+    );
+
+    return (
       <>
         <View style={styles.scrollViewContainerStyle}>
           <ScrollView
