@@ -1,6 +1,6 @@
 {
   "name": "react-native-awesome-chat",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "An easy to integrate library to create flexible, customizable chat UIs for React Native",
   "main": "index.js",
   "scripts": {

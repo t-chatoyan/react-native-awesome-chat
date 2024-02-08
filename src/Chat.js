@@ -250,7 +250,7 @@ class AwesomeChat extends Component {
             multiline
             inputContainerStyle={{...styles.inputContainerStyle, ... this.props.inputContainerStyle}}
             inputStyle={{...styles.inputStyle, ... this.props.inputStyle}}
-            leftIcon={leftIcon}
+            leftIcon={this.leftIcon}
             rightIcon={rightIcon}
             leftIconContainerStyle={{paddingLeft : "1.5%"}}
             rightIconContainerStyle={{paddingRight: "1.5%"}}
